@@ -22,10 +22,23 @@ use Illuminate\Validation\ValidationException;
 //});
 
 Route::get('/countries', function (){
-    $countries = Country::select('id', 'name')->with('cities:id,name')->get();
-    return response()->json($countries, 200, [
+    return response(Country::get(), 200, [
         'Content-Type' => 'application/json'
     ]);
+});
+
+Route::get('/cities/{country}', function ($countryId) {
+    // Ellenőrizzük, hogy az ország létezik
+    $country = Country::find($countryId);
+
+    if (!$country) {
+        return response()->json(['error' => 'Country not found'], 404);
+    }
+
+    // Lekérjük az országhoz tartozó városokat
+    $cities = $country->cities()->select('id', 'name')->get();
+
+    return response()->json($cities, 200);
 });
 
 Route::post('/register', function (Request $request) {

@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Cookie from 'js-cookie';
-import axios from 'axios';
 
 function Example() {
     const initialState = {
@@ -20,14 +19,32 @@ function Example() {
     const [data, setData] = React.useState(initialState);
     const [result, setResult] = React.useState({});
     const [countries, setCountries] = React.useState([]);
+    const [cities, setCities] = React.useState([]);
 
 
 
     const handleChange = (e) => {
-        setData({...data, [e.target.name]: e.target.value});
+        const { name, value } = e.target;
+
+        // Frissítsd az adatobjektumot
+        setData({ ...data, [name]: value });
+
+        // Ha az ország változik, küldd el a back-end-nek a városok lekéréséhez
+        if (name === 'country') {
+            // Küldj egy API kérést a városok lekérdezéséhez a kiválasztott ország alapján
+            fetch(`/api/cities/${value}`)
+                .then(response => response.json())
+                .then(cities => {
+                    // Frissítsd a városok állapotát a kapott adatokkal
+                    setCities(cities);
+                })
+                .catch(error => console.error('Error fetching cities:', error));
+        }
     }
 
+
     console.log(data);
+    console.log(cities);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -109,9 +126,13 @@ function Example() {
 
                                         <div className="col-6">
                                             <div className="fw-bold fs-5">Város:</div>
-                                            <select name="city" className="form-select" onChange={handleChange}>
-                                                <option value="someOption">Some option</option>
-                                            </select>
+                                            <input list="cities" name="city" className="form-control"
+                                                   onChange={handleChange}/>
+                                            <datalist id="cities">
+                                                {cities.map((city, index) => (
+                                                    <option value={city.name} key={index}/>
+                                                ))}
+                                            </datalist>
                                         </div>
                                     </div>
 
