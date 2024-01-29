@@ -19,10 +19,17 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('country');
+            $table->string('city');
+            $table->string('tel_number');
+            $table->date('date_of_birth');
+            $table->string('sex');
+            $table->boolean('accept_terms')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
@@ -27,9 +28,11 @@ Route::post('/register', function (Request $request) {
             'email' => 'required|email|unique:users',
             'country' => 'required',
             'city' => 'required',
-            'tel_number' => 'required',
+            'tel_number' => 'required|numeric',
             'date_of_birth' => 'required',
             'password' => 'required|min:4|max:12|confirmed',
+            'sex' => 'required',
+            'accept_terms' => 'required'
         ]);
     } catch (ValidationException $e) {
         $errors = $e->errors();
@@ -42,9 +45,14 @@ Route::post('/register', function (Request $request) {
                 'tel_number' => @$errors['tel_number'],
                 'date_of_birth' => @$errors['date_of_birth'],
                 'password' => @$errors['password'],
+                'sex' => @$errors['sex'],
+                'accept_terms' => @$errors['accept_terms']
             ],
             'status' => 'error'], 200);
     }
+
+    User::create($validated);
+
 
     return response(['success' => 'Sikeres validáció!']);
 
