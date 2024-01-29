@@ -5184,6 +5184,10 @@ function Example() {
     _React$useState4 = _slicedToArray(_React$useState3, 2),
     result = _React$useState4[0],
     setResult = _React$useState4[1];
+  var _React$useState5 = react__WEBPACK_IMPORTED_MODULE_0__.useState([]),
+    _React$useState6 = _slicedToArray(_React$useState5, 2),
+    countries = _React$useState6[0],
+    setCountries = _React$useState6[1];
   var handleChange = function handleChange(e) {
     setData(_objectSpread(_objectSpread({}, data), {}, _defineProperty({}, e.target.name, e.target.value)));
   };
@@ -5206,6 +5210,13 @@ function Example() {
       console.log(e);
     });
   };
+  react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
+    fetch('/api/countries').then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      return setCountries(data);
+    });
+  }, []);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
       className: "container my-3",
@@ -5273,11 +5284,13 @@ function Example() {
                       className: "form-select",
                       onChange: handleChange,
                       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("option", {
-                        value: "someOption",
-                        children: "Some option"
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("option", {
-                        value: "otherOption",
-                        children: "Other option"
+                        value: "",
+                        children: "V\xE1lassz orsz\xE1got"
+                      }), countries.map(function (country, index) {
+                        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("option", {
+                          value: country.id,
+                          children: country.name
+                        }, index);
                       })]
                     })]
                   }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
@@ -5285,17 +5298,14 @@ function Example() {
                     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
                       className: "fw-bold fs-5",
                       children: "V\xE1ros:"
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("select", {
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("select", {
                       name: "city",
                       className: "form-select",
                       onChange: handleChange,
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("option", {
+                      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("option", {
                         value: "someOption",
                         children: "Some option"
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("option", {
-                        value: "otherOption",
-                        children: "Other option"
-                      })]
+                      })
                     })]
                   })]
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {

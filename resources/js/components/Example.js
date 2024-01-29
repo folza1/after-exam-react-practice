@@ -19,6 +19,8 @@ function Example() {
 
     const [data, setData] = React.useState(initialState);
     const [result, setResult] = React.useState({});
+    const [countries, setCountries] = React.useState([]);
+
 
 
     const handleChange = (e) => {
@@ -47,6 +49,12 @@ function Example() {
                 console.log(e);
             })
     }
+
+    React.useEffect(() => {
+        fetch('/api/countries')
+            .then(response => response.json())
+            .then(data => setCountries(data));
+    }, []);
 
     return (
         <>
@@ -88,8 +96,14 @@ function Example() {
                                             {/*       placeholder="Add meg a neved"/>*/}
                                             <div className="fw-bold fs-5">Ország:</div>
                                             <select name="country" className="form-select" onChange={handleChange}>
-                                                <option value="someOption">Some option</option>
-                                                <option value="otherOption">Other option</option>
+                                                <option value="">Válassz országot</option>
+                                                {countries.map((country, index) => {
+                                                        return <option value={country.id}
+                                                                       key={index}>{country.name}</option>
+                                                    }
+                                                )}
+                                                {/*<option value="someOption">Some option</option>*/}
+                                                {/*<option value="otherOption">Other option</option>*/}
                                             </select>
                                         </div>
 
@@ -97,7 +111,6 @@ function Example() {
                                             <div className="fw-bold fs-5">Város:</div>
                                             <select name="city" className="form-select" onChange={handleChange}>
                                                 <option value="someOption">Some option</option>
-                                                <option value="otherOption">Other option</option>
                                             </select>
                                         </div>
                                     </div>

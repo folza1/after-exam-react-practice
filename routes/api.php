@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Country;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,13 @@ use Illuminate\Validation\ValidationException;
 //Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //    return $request->user();
 //});
+
+Route::get('/countries', function (){
+    $countries = Country::select('id', 'name')->with('cities:id,name')->get();
+    return response()->json($countries, 200, [
+        'Content-Type' => 'application/json'
+    ]);
+});
 
 Route::post('/register', function (Request $request) {
 
