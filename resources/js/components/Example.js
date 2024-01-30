@@ -73,6 +73,11 @@ function Example() {
             .then(data => setCountries(data));
     }, []);
 
+    React.useEffect(() => {
+        axios.get('/sanctum/csrf-cookie');
+        console.log(Cookie.get('XSRF-TOKEN'));
+    },[])
+
     return (
         <>
             <div className="container my-3">
@@ -127,7 +132,7 @@ function Example() {
                                         <div className="col-6">
                                             <div className="fw-bold fs-5">Város:</div>
                                             <input list="cities" name="city" className="form-control"
-                                                   onChange={handleChange}/>
+                                                   onChange={handleChange} placeholder="Válaszd ki a várost..."/>
                                             <datalist id="cities">
                                                 {cities.map((city, index) => (
                                                     <option value={city.name} key={index}/>

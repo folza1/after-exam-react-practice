@@ -5237,6 +5237,10 @@ function Example() {
       return setCountries(data);
     });
   }, []);
+  react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
+    axios.get('/sanctum/csrf-cookie');
+    console.log(js_cookie__WEBPACK_IMPORTED_MODULE_2__["default"].get('XSRF-TOKEN'));
+  }, []);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
       className: "container my-3",
@@ -5322,7 +5326,8 @@ function Example() {
                       list: "cities",
                       name: "city",
                       className: "form-control",
-                      onChange: handleChange
+                      onChange: handleChange,
+                      placeholder: "V\xE1laszd ki a v\xE1rost..."
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("datalist", {
                       id: "cities",
                       children: cities.map(function (city, index) {

@@ -3,6 +3,7 @@
 use App\Models\Country;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
@@ -76,5 +77,27 @@ Route::post('/register', function (Request $request) {
 
 
     return response(['success' => 'Sikeres validáció!']);
+
+});
+
+Route::post('/login', function (Request $request) {
+
+    $found = User::where('email', $request->email)->first();
+
+    if ($found===0){
+        return response(['message' => 'Nincs ilyen felhasználó!'], 404);
+    }
+
+    $attempt=Auth::attempt([
+        'email' => $request->email,
+        'password' => $request->password
+    ]);
+
+    if ($attempt) {
+        $request->user()->tokens()->createtoken()->plainTextToken;
+        return response(['message' => 'Sikeres bejelentkezés!']);
+    }
+
+    return response(['message' => 'Sikertelen bejelentkezés!'], 422);
 
 });
