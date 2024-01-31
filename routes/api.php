@@ -4,6 +4,7 @@ use App\Models\Country;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
@@ -73,10 +74,12 @@ Route::post('/register', function (Request $request) {
             'status' => 'error'], 200);
     }
 
+    $validated['password'] = Hash::make($validated['password']);
+
     User::create($validated);
 
 
-    return response(['success' => 'Sikeres validáció!']);
+    return response(['success' => 'Sikeres regisztráció!']);
 
 });
 
@@ -84,20 +87,20 @@ Route::post('/login', function (Request $request) {
 
     $found = User::where('email', $request->email)->first();
 
-    if ($found===0){
-        return response(['message' => 'Nincs ilyen felhasználó!'], 404);
+    if ($found === null) {
+        return response(['status'=>'error', 'message' => 'Wrong email or password'], 404);
     }
 
-    $attempt=Auth::attempt([
+    $attempt = Auth::attempt([
         'email' => $request->email,
-        'password' => $request->password
-    ]);
+        'password' => $request->password,
+    ], $request->remember);
 
     if ($attempt) {
-        $request->user()->tokens()->createtoken()->plainTextToken;
-        return response(['message' => 'Sikeres bejelentkezés!']);
+        $token = $request->user()->createToken('token-name')->plainTextToken;
+        return response(['status' => 'success', 'message' => 'Sikeres bejelentkezés!', 'token' => $token]);
     }
 
-    return response(['message' => 'Sikertelen bejelentkezés!'], 422);
+    return response(['status'=>'error', 'message' => 'Wrong password'], 422);
 
 });

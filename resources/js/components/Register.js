@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Cookie from 'js-cookie';
 
-function Example() {
+function Register() {
     const initialState = {
         name: '',
         email: '',
@@ -95,7 +95,7 @@ function Example() {
                 <div className="row justify-content-center">
                     <div className="col-md-8">
                         <div className="card">
-                            <div className="my-3 mx-auto">Regisztráció</div>
+                            <div className="my-3 mx-auto fw-bold fs-3">Regisztráció</div>
                             <form className="card-body" onSubmit={handleSubmit}>
                                 <div className="g-3">
                                     <div className="row mt-3">
@@ -218,8 +218,8 @@ function Example() {
     );
 }
 
-export default Example;
+export default Register;
 
-if (document.getElementById('example')) {
-    ReactDOM.render(<Example/>, document.getElementById('example'));
-}
+// if (document.getElementById('example')) {
+//     ReactDOM.render(<Register/>, document.getElementById('example'));
+// }
