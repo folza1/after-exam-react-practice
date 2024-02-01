@@ -6,7 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Cookie;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +26,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/countries', function (){
+Route::get('/countries', function () {
     return response(Country::get(), 200, [
         'Content-Type' => 'application/json'
     ]);
@@ -45,50 +48,46 @@ Route::get('/cities/{country}', function ($countryId) {
 
 Route::post('/register', function (Request $request) {
 
-    try {
-        $validated = $request->validate([
-            'name' => 'required|min:4|max:30',
-            'email' => 'required|email|unique:users',
-            'country' => 'required',
-            'city' => 'required',
-            'tel_number' => 'required|numeric',
-            'date_of_birth' => 'required',
-            'password' => 'required|min:4|max:12|confirmed',
-            'sex' => 'required',
-            'accept_terms' => 'required'
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|min:4|max:30',
+        'email' => 'required|email|unique:users',
+        'country' => 'required',
+        'city' => 'required',
+        'tel_number' => 'required|numeric',
+        'date_of_birth' => 'required',
+        'password' => 'required|min:4|max:12|confirmed',
+        'sex' => 'required',
+        'accept_terms' => 'required'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'validation_errors' => $validator->messages(),
         ]);
-    } catch (ValidationException $e) {
-        $errors = $e->errors();
-        return response(['errors' =>
-            [
-                'name' => @$errors['name'],
-                'email' => @$errors['email'],
-                'country' => @$errors['country'],
-                'city' => @$errors['city'],
-                'tel_number' => @$errors['tel_number'],
-                'date_of_birth' => @$errors['date_of_birth'],
-                'password' => @$errors['password'],
-                'sex' => @$errors['sex'],
-                'accept_terms' => @$errors['accept_terms']
-            ],
-            'status' => 'error'], 200);
+    } else {
+
+        $validatedData = $validator->validated();
+        $validatedData['password'] = Hash::make($validatedData['password']);
+
+        $user = User::create($validatedData);
+        $token = $user->createToken($user->email.'_Token')->plainTextToken;
+
+        return response()->json([
+            'status' => 200,
+            'username' => $user->name,
+            'token' => $token,
+            'message' => 'Registered Successfully!'
+        ]);
     }
-
-    $validated['password'] = Hash::make($validated['password']);
-
-    User::create($validated);
-
-
-    return response(['success' => 'Sikeres regisztráció!']);
-
 });
+
 
 Route::post('/login', function (Request $request) {
 
     $found = User::where('email', $request->email)->first();
 
     if ($found === null) {
-        return response(['status'=>'error', 'message' => 'Wrong email.'], 404);
+        return response(['status' => 'error', 'message' => 'Wrong email.'], 404);
     }
 
     $attempt = Auth::attempt([
@@ -98,9 +97,11 @@ Route::post('/login', function (Request $request) {
 
     if ($attempt) {
         $token = $request->user()->createToken('token-name')->plainTextToken;
-        return response(['status' => 'success', 'message' => 'Sikeres bejelentkezés!', 'token' => $token]);
+
+        $cookie = cookie('access_token', $token, 60 * 24 * 30, null, null, false, false, 'Lax');
+        return response(['status' => 'success', 'message' => 'Sikeres bejelentkezés!'])->withCookie($cookie);
     }
 
-    return response(['status'=>'error', 'message' => 'Wrong password.'], 422);
+    return response(['status' => 'error', 'message' => 'Wrong password.'], 422);
 
 });

@@ -26,6 +26,8 @@
     "dependencies": {
         "bootstrap": "^5.3.2",
         "js-cookie": "^3.0.5",
-        "react-router-dom": "^6.21.3"
+        "react-router-dom": "^6.21.3",
+        "sweetalert": "^2.1.2",
+        "sweetalert2": "^11.10.4"
     }
 }

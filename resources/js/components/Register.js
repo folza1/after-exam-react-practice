@@ -1,8 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Cookie from 'js-cookie';
+import axios from "axios";
+import swal from 'sweetalert2';
+import {useNavigate} from "react-router-dom";
 
 function Register() {
+
+    const navigate = useNavigate();
+
     const initialState = {
         name: '',
         email: '',
@@ -14,6 +20,7 @@ function Register() {
         password_confirmation: '',
         sex: '',
         accept_terms: '',
+        error_list: []
     };
 
     const [data, setData] = React.useState(initialState);
@@ -22,12 +29,11 @@ function Register() {
     const [cities, setCities] = React.useState([]);
 
 
-
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
 
         // Frissítsd az adatobjektumot
-        setData({ ...data, [name]: value });
+        setData({...data, [name]: value});
 
         // Ha az ország változik, küldd el a back-end-nek a városok lekéréséhez
         if (name === 'country') {
@@ -48,23 +54,23 @@ function Register() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        fetch('/api/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-XSRF-Token': Cookie.get('XSRF-TOKEN'),
-            },
-            body: JSON.stringify(data)
-        }).then(res => {
-            console.log(res);
-            return res.json();
+        axios.get('/sanctum/csrf-cookie').then(response => {
+            axios.post('/api/register', data).then(res => {
+                if (res.data.status === 200) {
+                    localStorage.setItem('auth_token', res.data.token);
+                    localStorage.setItem('auth_name', res.data.username);
+                    swal.fire({
+                        title: "Success!",
+                        text: res.data.message,
+                        icon: "success"
+                    });
+                    navigate('/login');
+                }
+                else {
+                    setData({...data, error_list: res.data.validation_errors});
+                }
+            })
         })
-            .then(res => {
-                setResult(res);
-            })
-            .catch(e => {
-                console.log(e);
-            })
     }
 
     React.useEffect(() => {
@@ -73,25 +79,20 @@ function Register() {
             .then(data => setCountries(data));
     }, []);
 
-    React.useEffect(() => {
-        axios.get('/sanctum/csrf-cookie');
-        console.log(Cookie.get('XSRF-TOKEN'));
-    },[])
-
     return (
         <>
             <div className="container my-3">
-                {result.status === 'error' && <div className="alert alert-danger">{
-                    function () {
-                        let tomb = [];
-                        for (let kulcs in result.errors) {
+                {/*{result.status === 'error' && <div className="alert alert-danger">{*/}
+                {/*    function () {*/}
+                {/*        let tomb = [];*/}
+                {/*        for (let kulcs in result.errors) {*/}
 
-                            if (result.errors[kulcs] && result.errors[kulcs].length > 0)
-                                tomb.push(<li key={kulcs}>{result.errors[kulcs]}</li>)
-                        }
-                        return tomb;
-                    }()
-                }</div>}
+                {/*            if (result.errors[kulcs] && result.errors[kulcs].length > 0)*/}
+                {/*                tomb.push(<li key={kulcs}>{result.errors[kulcs]}</li>)*/}
+                {/*        }*/}
+                {/*        return tomb;*/}
+                {/*    }()*/}
+                {/*}</div>}*/}
                 <div className="row justify-content-center">
                     <div className="col-md-8">
                         <div className="card">
@@ -103,12 +104,14 @@ function Register() {
                                             <div className="fw-bold fs-5">Neved:</div>
                                             <input type="text" name="name" className="form-control"
                                                    placeholder="Add meg a neved" onChange={handleChange}/>
+                                            <span className="text-danger">{data.error_list.name}</span>
                                         </div>
 
                                         <div className="col-6">
                                             <div className="fw-bold fs-5">Email:</div>
                                             <input type="email" name="email" className="form-control"
                                                    placeholder="Add meg az email-ed" onChange={handleChange}/>
+                                            <span className="text-danger">{data.error_list.email}</span>
                                         </div>
                                     </div>
 
@@ -123,6 +126,7 @@ function Register() {
                                                     }
                                                 )}
                                             </select>
+                                            <span className="text-danger">{data.error_list.country}</span>
                                         </div>
 
                                         <div className="col-6">
@@ -134,6 +138,7 @@ function Register() {
                                                     <option value={city.name} key={index}/>
                                                 ))}
                                             </datalist>
+                                            <span className="text-danger">{data.error_list.city}</span>
                                         </div>
                                     </div>
 
@@ -142,12 +147,14 @@ function Register() {
                                             <div className="fw-bold fs-5">Telefonszámod:</div>
                                             <input type="tel" name="tel_number" className="form-control"
                                                    placeholder="Add meg a telefonszámod" onChange={handleChange}/>
+                                            <span className="text-danger">{data.error_list.tel_number}</span>
                                         </div>
 
                                         <div className="col-6">
                                             <div className="fw-bold fs-5">Születési idő:</div>
                                             <input type="date" name="date_of_birth" className="form-control"
                                                    onChange={handleChange}/>
+                                            <span className="text-danger">{data.error_list.date_of_birth}</span>
                                         </div>
                                     </div>
 
@@ -156,6 +163,7 @@ function Register() {
                                             <div className="fw-bold fs-5">Jelszó:</div>
                                             <input type="text" name="password" className="form-control"
                                                    placeholder="Add meg a jelszót" onChange={handleChange}/>
+                                            <span className="text-danger">{data.error_list.password}</span>
                                         </div>
 
                                         <div className="col-6">
@@ -163,6 +171,7 @@ function Register() {
 
                                             <input type="text" name="password_confirmation" className="form-control"
                                                    placeholder="Add meg a jelszót ismét" onChange={handleChange}/>
+                                            <span className="text-danger">{data.error_list.password_confirmation}</span>
                                         </div>
                                     </div>
 
@@ -189,6 +198,7 @@ function Register() {
                                                 Egyéb
                                             </label>
                                         </div>
+                                        <span className="text-danger">{data.error_list.sex}</span>
                                     </div>
 
                                     <div className="my-3">
@@ -199,10 +209,11 @@ function Register() {
                                                 A felhasználási feltételeket elfogadom
                                             </label>
                                         </div>
+                                        <span className="text-danger">{data.error_list.accept_terms}</span>
                                     </div>
 
                                     <div className="col-12">
-                                        <button type="submit" className="btn btn-success">Regisztrálok</button>
+                                    <button type="submit" className="btn btn-success">Regisztrálok</button>
                                     </div>
                                 </div>
                             </form>
