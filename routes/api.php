@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Cookie;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -98,7 +100,9 @@ Route::post('/login', function (Request $request) {
 
     if ($attempt) {
         $token = $request->user()->createToken('token-name')->plainTextToken;
-        return response(['status' => 'success', 'message' => 'Sikeres bejelentkezés!', 'token' => $token]);
+
+        $cookie = cookie('access_token', $token, 60 * 24 * 30, null, null, false, false, 'Lax');
+        return response(['status' => 'success', 'message' => 'Sikeres bejelentkezés!'])->withCookie($cookie);
     }
 
     return response(['status'=>'error', 'message' => 'Wrong password.'], 422);

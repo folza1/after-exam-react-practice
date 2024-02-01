@@ -1,21 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import ReactDOM from 'react-dom';
+import Cookies from 'js-cookie';
 
 function Profile() {
     const [user, setUser] = useState({});
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        axios.get('/api/user')
-            .then(response => {
-                setUser(response.data);
-            })
-            .catch(error => {
+        const fetchUserData = async () => {
+            try {
+                // Olvassuk ki az 'access_token' nevű cookie értékét
+                const storedToken = Cookies.get('access_token');
+
+                if (storedToken) {
+                    // Küldj egy GET kérést az /api/user végpontra a tárolt tokennel
+                    const response = await axios.get('/api/user', {
+                        headers: {
+                            'Authorization': `Bearer ${storedToken}`, // Helyettesítsd a tokent a sajátoddal
+                        },
+                    });
+
+                    // Frissítsd az állapotot a válaszból kapott felhasználói adatokkal
+                    setUser(response.data);
+                } else {
+                    setError('Token cookie not found');
+                }
+            } catch (error) {
                 console.error('Error fetching user data:', error);
-            });
+                setError('Error fetching user data');
+            }
+        };
+
+        // Hívd meg a függvényt
+        fetchUserData();
     }, []);
 
-    console.log(user);
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     return (
         <>
@@ -27,8 +49,3 @@ function Profile() {
 }
 
 export default Profile;
-
-
-// if (document.getElementById('example')) {
-//     ReactDOM.render(<Register/>, document.getElementById('example'));
-// }
