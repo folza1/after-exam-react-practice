@@ -114,8 +114,6 @@ function Register() {
 
                                     <div className="row mt-3">
                                         <div className="col-6">
-                                            {/*<input type="select" name="country" className="form-control"*/}
-                                            {/*       placeholder="Add meg a neved"/>*/}
                                             <div className="fw-bold fs-5">Ország:</div>
                                             <select name="country" className="form-select" onChange={handleChange}>
                                                 <option value="">Válassz országot</option>
@@ -124,8 +122,6 @@ function Register() {
                                                                        key={index}>{country.name}</option>
                                                     }
                                                 )}
-                                                {/*<option value="someOption">Some option</option>*/}
-                                                {/*<option value="otherOption">Other option</option>*/}
                                             </select>
                                         </div>
 

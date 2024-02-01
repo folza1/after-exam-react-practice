@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Cookie from 'js-cookie';
+import {useNavigate} from "react-router-dom";
 
 function Login() {
     const initialState = {
@@ -10,6 +11,8 @@ function Login() {
 
     const [data, setData] = React.useState(initialState);
     const [result, setResult] = React.useState({});
+
+    const nav = useNavigate();
 
     const handleChange = (e) => {
         setData({...data, [e.target.name]: e.target.value});
@@ -33,10 +36,14 @@ function Login() {
         })
             .then(res => {
                 setResult(res);
+                if (res.status === 'success') {
+                    window.alert('Sikeres bejelentkezés!');
+                    nav('/profile');
+                }
             })
             .catch(e => {
                 console.log(e);
-            })
+            });
     }
 
     React.useEffect(() => {

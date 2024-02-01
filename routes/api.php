@@ -18,10 +18,10 @@ use Illuminate\Validation\ValidationException;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-//
-//Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//    return $request->user();
-//});
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
 
 Route::get('/countries', function (){
     return response(Country::get(), 200, [
@@ -88,7 +88,7 @@ Route::post('/login', function (Request $request) {
     $found = User::where('email', $request->email)->first();
 
     if ($found === null) {
-        return response(['status'=>'error', 'message' => 'Wrong email or password'], 404);
+        return response(['status'=>'error', 'message' => 'Wrong email.'], 404);
     }
 
     $attempt = Auth::attempt([
@@ -101,6 +101,6 @@ Route::post('/login', function (Request $request) {
         return response(['status' => 'success', 'message' => 'Sikeres bejelentkezés!', 'token' => $token]);
     }
 
-    return response(['status'=>'error', 'message' => 'Wrong password'], 422);
+    return response(['status'=>'error', 'message' => 'Wrong password.'], 422);
 
 });
