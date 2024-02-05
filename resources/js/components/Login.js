@@ -2,11 +2,19 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Cookie from 'js-cookie';
 import {useNavigate} from "react-router-dom";
+import axios from "axios";
+import swal from "sweetalert2";
+
 
 function Login() {
+
+    const navigate = useNavigate();
+
+
     const initialState = {
         email: '',
         password: '',
+        error_list: [],
     };
 
     const [data, setData] = React.useState(initialState);
@@ -23,27 +31,28 @@ function Login() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-XSRF-Token': Cookie.get('XSRF-TOKEN'),
-            },
-            body: JSON.stringify(data)
-        }).then(res => {
-            console.log(res);
-            return res.json();
-        })
-            .then(res => {
-                setResult(res);
-                if (res.status === 'success') {
-                    window.alert('Sikeres bejelentkezés!');
-                    nav('/profile');
+        axios.get('/sanctum/csrf-cookie').then(response => {
+            axios.post('/api/loginmy', data).then(res => {
+                if (res.data.status === 200) {
+                    localStorage.setItem('auth_token', res.data.token);
+                    localStorage.setItem('auth_name', res.data.username);
+                    swal.fire({
+                        title: "Success!",
+                        text: res.data.message,
+                        icon: "success"
+                    });
+                    navigate('/profile');
+                } else if (res.data.status === 401) {
+                    swal.fire({
+                        title: "Warning!",
+                        text: res.data.message,
+                        icon: "warning"
+                    });
+                } else {
+                    setData({...data, error_list: res.data.validation_errors});
                 }
             })
-            .catch(e => {
-                console.log(e);
-            });
+        })
     }
 
     React.useEffect(() => {
@@ -68,11 +77,13 @@ function Login() {
                                             <div className="fw-bold fs-5">Email:</div>
                                             <input type="email" name="email" className="form-control"
                                                    placeholder="Add meg az email-ed" onChange={handleChange}/>
+                                            <span className="text-danger">{data.error_list.email}</span>
                                         </div>
                                         <div className="col-6">
                                             <div className="fw-bold fs-5">Jelszó:</div>
                                             <input type="text" name="password" className="form-control"
                                                    placeholder="Add meg a jelszót" onChange={handleChange}/>
+                                            <span className="text-danger">{data.error_list.password}</span>
                                         </div>
                                     </div>
                                     <div className="col-12">

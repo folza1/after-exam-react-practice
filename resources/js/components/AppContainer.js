@@ -18,7 +18,7 @@ function AppContainer() {
         <BrowserRouter>
             <Routes>
                 <Route index element={<Register/>}/>
-                <Route path='/login' element={<Login/>}/>
+                <Route path='/loginmy' element={<Login/>}/>
                 <Route path='/profile' element={<Profile/>}/>
             </Routes>
         </BrowserRouter>

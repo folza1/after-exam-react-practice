@@ -70,7 +70,7 @@ Route::post('/register', function (Request $request) {
         $validatedData['password'] = Hash::make($validatedData['password']);
 
         $user = User::create($validatedData);
-        $token = $user->createToken($user->email.'_Token')->plainTextToken;
+        $token = $user->createToken($user->email . '_Token')->plainTextToken;
 
         return response()->json([
             'status' => 200,
@@ -82,26 +82,38 @@ Route::post('/register', function (Request $request) {
 });
 
 
-Route::post('/login', function (Request $request) {
+Route::post('/loginmy', function (Request $request) {
 
-    $found = User::where('email', $request->email)->first();
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|max:191',
+        'password' => 'required',
+    ]);
 
-    if ($found === null) {
-        return response(['status' => 'error', 'message' => 'Wrong email.'], 404);
+    if ($validator->fails()) {
+        return response()->json([
+            'validation_errors' => $validator->messages(),
+        ]);
     }
+    else {
+        $user = User::where('email', $request->email)->first();
 
-    $attempt = Auth::attempt([
-        'email' => $request->email,
-        'password' => $request->password,
-    ], $request->remember);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => 401,
+                'message' => 'Invalid Credentials',
+            ]);
+        }
 
-    if ($attempt) {
-        $token = $request->user()->createToken('token-name')->plainTextToken;
+        else {
+            $token = $user->createToken($user->email.'_Token')->plainTextToken;
 
-        $cookie = cookie('access_token', $token, 60 * 24 * 30, null, null, false, false, 'Lax');
-        return response(['status' => 'success', 'message' => 'Sikeres bejelentkezés!'])->withCookie($cookie);
+            return response()->json([
+                'status' => 200,
+                'username' => $user->name,
+                'token' => $token,
+                'message' => 'Logged In Successfully!'
+            ]);
+        }
+
     }
-
-    return response(['status' => 'error', 'message' => 'Wrong password.'], 422);
-
 });
