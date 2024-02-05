@@ -1,10 +1,21 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import swal from "sweetalert2";
 import {useNavigate} from "react-router-dom";
 
 function Profile() {
+
+    const [user, setUser] = useState({});
+
+    useEffect(() => {
+        axios.get('/api/user')
+            .then(response => {
+                setUser(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
+            });
+    }, []);
 
     const navigate = useNavigate();
 
@@ -20,14 +31,14 @@ function Profile() {
                     text: res.data.message,
                     icon: "success"
                 });
-                navigate('/');
+                navigate('/loginmy');
             }
         })
     }
 
     return (
         <>
-            <h2>Üdv kedves! Be vagy lépve!</h2>
+            <h2>Üdv kedves {user.name} Be vagy lépve!</h2>
             <button type="button" onClick={logoutSubmit} className="nav-link btn btn-danger">Kijelentkezés</button>
         </>
     );

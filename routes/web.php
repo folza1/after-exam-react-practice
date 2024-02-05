@@ -24,11 +24,7 @@ Route::get('/loginmy', function () {
 
 Route::get('/profile', function () {
     return view('welcome');
-})->middleware('auth');
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+})->middleware(\App\Http\Middleware\LoggedInMiddleware::class)->name('profile');
 
 Auth::routes();
 
