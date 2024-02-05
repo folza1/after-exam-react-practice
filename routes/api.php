@@ -117,3 +117,13 @@ Route::post('/loginmy', function (Request $request) {
 
     }
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logoutmy', function () {
+        Auth::user()->tokens()->delete();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Logged Out Successfully!'
+        ]);
+    });
+});
