@@ -20,11 +20,11 @@ Route::get('/', function () {
 
 Route::get('/loginmy', function () {
     return view('welcome');
-});
+})->name('loginmy');
 
 Route::get('/profile', function () {
     return view('welcome');
-});
+})->middleware('auth');
 
 Auth::routes();
 
