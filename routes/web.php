@@ -24,7 +24,7 @@ Route::get('/loginmy', function () {
 
 Route::get('/profile', function () {
     return view('welcome');
-})->middleware(\App\Http\Middleware\LoggedInMiddleware::class)->name('profile');
+})->name('profile');
 
 Auth::routes();
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import Cookie from 'js-cookie';
 import {useNavigate} from "react-router-dom";
@@ -26,9 +26,7 @@ function Login() {
         setData({...data, [e.target.name]: e.target.value});
     }
 
-
     console.log(data);
-
     const handleSubmit = (e) => {
         e.preventDefault();
         axios.get('/sanctum/csrf-cookie').then(response => {
@@ -59,6 +57,16 @@ function Login() {
         axios.get('/sanctum/csrf-cookie');
         console.log(Cookie.get('XSRF-TOKEN'));
     }, [])
+
+    useEffect(() => {
+        const authToken = localStorage.getItem('auth_token');
+        if (authToken) {
+            navigate('/profile');
+        } else {
+            // Ha nincs auth_token, irányítsd vissza a felhasználót a bejelentkezési oldalra
+            navigate('/loginmy');
+        }
+    }, []);
 
     return (
         <>

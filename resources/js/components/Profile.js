@@ -5,19 +5,31 @@ import {useNavigate} from "react-router-dom";
 
 function Profile() {
 
+    const navigate = useNavigate();
+
     const [user, setUser] = useState({});
 
     useEffect(() => {
-        axios.get('/api/user')
-            .then(response => {
-                setUser(response.data);
+        const authToken = localStorage.getItem('auth_token');
+        if (authToken) {
+            axios.get('/api/user', {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                }
             })
-            .catch(error => {
-                console.error('Error fetching user data:', error);
-            });
+                .then(response => {
+                    setUser(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                });
+        } else {
+            // Ha nincs auth_token, irányítsd vissza a felhasználót a bejelentkezési oldalra
+            navigate('/loginmy');
+        }
     }, []);
-
-    const navigate = useNavigate();
 
 
     const logoutSubmit = (e) => {

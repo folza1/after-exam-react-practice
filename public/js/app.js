@@ -9630,6 +9630,15 @@ function Login() {
     axios__WEBPACK_IMPORTED_MODULE_3___default().get('/sanctum/csrf-cookie');
     console.log(js_cookie__WEBPACK_IMPORTED_MODULE_2__["default"].get('XSRF-TOKEN'));
   }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    var authToken = localStorage.getItem('auth_token');
+    if (authToken) {
+      navigate('/profile');
+    } else {
+      // Ha nincs auth_token, irányítsd vissza a felhasználót a bejelentkezési oldalra
+      navigate('/loginmy');
+    }
+  }, []);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
       className: "container my-3",
@@ -9742,18 +9751,30 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 function Profile() {
+  var navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_4__.useNavigate)();
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({}),
     _useState2 = _slicedToArray(_useState, 2),
     user = _useState2[0],
     setUser = _useState2[1];
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    axios__WEBPACK_IMPORTED_MODULE_1___default().get('/api/user').then(function (response) {
-      setUser(response.data);
-    })["catch"](function (error) {
-      console.error('Error fetching user data:', error);
-    });
+    var authToken = localStorage.getItem('auth_token');
+    if (authToken) {
+      axios__WEBPACK_IMPORTED_MODULE_1___default().get('/api/user', {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': "Bearer ".concat(authToken)
+        }
+      }).then(function (response) {
+        setUser(response.data);
+      })["catch"](function (error) {
+        console.error('Error fetching user data:', error);
+      });
+    } else {
+      // Ha nincs auth_token, irányítsd vissza a felhasználót a bejelentkezési oldalra
+      navigate('/loginmy');
+    }
   }, []);
-  var navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_4__.useNavigate)();
   var logoutSubmit = function logoutSubmit(e) {
     e.preventDefault();
     axios__WEBPACK_IMPORTED_MODULE_1___default().post('/api/logoutmy').then(function (res) {
